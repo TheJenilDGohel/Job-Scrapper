@@ -7,6 +7,7 @@ const SqliteStorage = require('../storage/sqliteStorage');
 const LinkedinScraper = require('../scraper/linkedinScraper');
 const WellfoundScraper = require('../scraper/wellfoundScraper');
 const MatchingEngine = require('../matching/engine');
+const NotificationService = require('../notifications/index');
 
 program
   .version('1.0.0')
@@ -91,6 +92,10 @@ program
         });
 
         console.log(table(data));
+
+        // 6. Notify
+        const notifier = new NotificationService();
+        await notifier.notify(newJobs.filter(j => j.score > 50));
       } else {
         console.log('No new jobs found this run.');
       }
