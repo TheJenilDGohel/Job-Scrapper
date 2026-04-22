@@ -4,7 +4,7 @@
 *Status: Planned*
 *Goal: Build the CV parser, scraper engine, matching logic, and CLI output.*
 
-- [ ] **Phase 1: Project Setup & Storage**
+- [x] **Phase 1: Project Setup & Storage**
   - Setup Node.js project.
   - Implement basic JSON and SQLite storage interfaces.
 - [ ] **Phase 2: CV Intelligence Engine**
