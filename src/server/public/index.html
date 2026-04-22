@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autonomous Job Discovery Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <main class="container">
+        <header class="header">
+            <div class="logo-area">
+                <div class="logo-icon">JD</div>
+                <h1>Job Discovery Engine</h1>
+            </div>
+            <div class="stats">
+                <div class="stat-card">
+                    <span class="stat-value" id="total-jobs">0</span>
+                    <span class="stat-label">Total Jobs Found</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="controls">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search jobs, skills, or companies...">
+            </div>
+            <div class="filter-box">
+                <button class="btn active" data-filter="all">All Jobs</button>
+                <button class="btn" data-filter="high-score">Top Matches (>60)</button>
+            </div>
+        </section>
+
+        <section class="job-grid" id="job-grid">
+            <!-- Job cards will be injected here via JS -->
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Analyzing job data...</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
