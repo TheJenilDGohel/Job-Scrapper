@@ -14,14 +14,14 @@
   - Setup `axios` and `cheerio` for fast scraping.
   - Setup `puppeteer` for fallback.
   - Implement anti-block utilities (random delays, user-agent rotation).
-- [ ] **Phase 4: Job Source Integrations**
+- [x] **Phase 4: Job Source Integrations**
   - Implement LinkedIn public search scraper.
   - Implement Indeed / Wellfound scrapers.
   - Implement basic Company Career page crawler.
-- [ ] **Phase 5: Matching Engine**
+- [x] **Phase 5: Matching Engine**
   - Implement scoring logic (skillMatch * 0.5 + titleMatch * 0.3 + experienceMatch * 0.2).
   - Implement keyword and fuzzy matching.
-- [ ] **Phase 6: CLI & Automation**
+- [x] **Phase 6: CLI & Automation**
   - Build CLI to display top jobs.
   - Implement `node-cron` automation for periodic fetching.
 
@@ -29,10 +29,10 @@
 *Status: Planned*
 *Goal: Add Express.js dashboard and Telegram alerts.*
 
-- [ ] **Phase 7: Web Dashboard**
+- [x] **Phase 7: Web Dashboard**
   - Setup Express.js server.
   - Build simple frontend with HTML + Tailwind to view matches.
-- [ ] **Phase 8: Alert System**
+- [x] **Phase 8: Alert System**
   - Integrate Telegram bot for alerts.
   - Integrate Nodemailer for email alerts.
 
