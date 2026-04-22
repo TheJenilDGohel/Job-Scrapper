@@ -7,10 +7,10 @@
 - [x] **Phase 1: Project Setup & Storage**
   - Setup Node.js project.
   - Implement basic JSON and SQLite storage interfaces.
-- [ ] **Phase 2: CV Intelligence Engine**
+- [x] **Phase 2: CV Intelligence Engine**
   - Implement PDF parsing using `pdf-parse`.
   - Extract skills, roles, experience, and keywords into a structured profile.
-- [ ] **Phase 3: Scraper Engine Core**
+- [x] **Phase 3: Scraper Engine Core**
   - Setup `axios` and `cheerio` for fast scraping.
   - Setup `puppeteer` for fallback.
   - Implement anti-block utilities (random delays, user-agent rotation).
