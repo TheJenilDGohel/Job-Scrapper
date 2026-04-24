@@ -6,7 +6,7 @@ class LinkedinScraper extends BaseScraper {
     const encodedKeyword = encodeURIComponent(keyword);
     const encodedLocation = encodeURIComponent(location);
     // Use the public jobs search URL
-    const url = `https://www.linkedin.com/jobs/search?keywords=${encodedKeyword}&location=${encodedLocation}&f_TPR=r86400&position=1&pageNum=0`;
+    const url = `https://www.linkedin.com/jobs/search?keywords=${encodedKeyword}&location=${encodedLocation}&geoId=102713980&f_TPR=r86400&position=1&pageNum=0`;
 
     console.log(`Scraping LinkedIn for ${keyword} in ${location}...`);
     const $ = await this.fetch(url, false); // Try fast fetch first

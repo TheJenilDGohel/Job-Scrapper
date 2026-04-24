@@ -66,6 +66,59 @@ class BaseScraper {
     }
     return $;
   }
+
+  async getJobDetails(url, companyName) {
+    const $ = await this.fetch(url, true);
+    if (!$) return null;
+
+    // 1. Job Description (Extracting raw text from common JD containers or body)
+    // Often wrapped in 'main', 'article', '.description', or similar. If not, just grab body.
+    let descriptionText = '';
+    const possibleContainers = ['main', 'article', '.job-description', '.description', '#job-details', '.show-more-less-html__markup'];
+    for (const selector of possibleContainers) {
+      if ($(selector).length) {
+        descriptionText = $(selector).text().trim().replace(/[ \t]+/g, ' '); // Only replace horizontal tabs/spaces
+        if (descriptionText.length > 200) break; // Found a substantial block
+      }
+    }
+    
+    // Fallback to body if we couldn't find a good container
+    if (!descriptionText || descriptionText.length < 200) {
+      descriptionText = $('body').text().trim().replace(/[ \t]+/g, ' ');
+    }
+
+    // 2. Extract Contact Emails via Regex
+    const emailRegex = /[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+/gi;
+    const emailsFound = descriptionText.match(emailRegex) || [];
+    // remove duplicates and filter out image/sentry/common false positives
+    const contactEmail = [...new Set(emailsFound)].filter(e => 
+      !e.includes('sentry.io') && 
+      !e.endsWith('.png') && 
+      !e.endsWith('.jpg')
+    ).join(', ');
+
+    // 3. Extract Company URL
+    let companyUrl = '';
+    const companyLower = companyName ? companyName.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+    if (companyLower) {
+      $('a').each((i, el) => {
+        const href = $(el).attr('href');
+        if (href && href.startsWith('http') && !href.includes('linkedin.com') && !href.includes('wellfound.com')) {
+          const domain = new URL(href).hostname.replace('www.', '').toLowerCase();
+          if (domain.includes(companyLower)) {
+            companyUrl = href;
+            return false; // Break loop
+          }
+        }
+      });
+    }
+
+    return {
+      jobDescription: descriptionText.substring(0, 5000), // Limit size for DB
+      contactEmail: contactEmail || null,
+      companyUrl: companyUrl || null
+    };
+  }
 }
 
 module.exports = BaseScraper;

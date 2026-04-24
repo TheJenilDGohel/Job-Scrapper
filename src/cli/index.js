@@ -3,7 +3,7 @@ const chalk = require('chalk');
 const { table } = require('table');
 const path = require('path');
 const CvParser = require('../parser/cvParser');
-const SqliteStorage = require('../storage/sqliteStorage');
+const { getStorage } = require('../storage/index');
 const LinkedinScraper = require('../scraper/linkedinScraper');
 const WellfoundScraper = require('../scraper/wellfoundScraper');
 const MatchingEngine = require('../matching/engine');
@@ -17,6 +17,7 @@ program
   .command('run')
   .description('Run the full extraction, scraping, and matching pipeline')
   .option('-c, --cv <path>', 'Path to your CV (PDF)', path.join(__dirname, '../../sample.pdf'))
+  .option('-l, --location <location>', 'Location to search for jobs', 'India')
   .action(async (options) => {
     try {
       console.log(chalk.blue('=== Autonomous Job Scraper ==='));
@@ -41,7 +42,7 @@ program
 
       // 2. Initialize Storage
       console.log(chalk.yellow('\n[2] Initializing Storage...'));
-      const storage = new SqliteStorage(path.join(__dirname, '../../data/jobs.db'));
+      const storage = getStorage();
 
       // 3. Run Scrapers
       console.log(chalk.yellow('\n[3] Scraping Jobs...'));
@@ -49,11 +50,10 @@ program
       const linkedin = new LinkedinScraper();
       const wellfound = new WellfoundScraper();
 
-      // For each role, do a search
       for (const role of userProfile.roles) {
-        console.log(chalk.dim(`Scraping for role: ${role}`));
-        const liJobs = await linkedin.scrape(role, 'Remote'); // Hardcoded Remote for now
-        const wfJobs = await wellfound.scrape(role, 'Remote');
+        console.log(chalk.dim(`Scraping for role: ${role} in ${options.location}`));
+        const liJobs = await linkedin.scrapeJobs(role, options.location);
+        const wfJobs = await wellfound.scrapeJobs(role, options.location);
         allJobs = allJobs.concat(liJobs, wfJobs);
       }
 
@@ -68,8 +68,21 @@ program
       console.log(chalk.yellow('\n[5] Saving & Displaying Results...'));
       const newJobs = [];
       for (const job of rankedJobs) {
-        if (!storage.exists(job.jobUrl)) {
-          storage.save(job);
+        if (!(await storage.exists(job.url))) {
+          // Deep scrape for high-potential jobs
+          if (job.score > 40) {
+            process.stdout.write(chalk.dim(`  - Deep scraping: ${job.jobTitle.substring(0, 20)}... `));
+            const scraper = job.source === 'LinkedIn' ? linkedin : wellfound;
+            const details = await scraper.getJobDetails(job.url, job.company);
+            if (details) {
+              Object.assign(job, details);
+              console.log(chalk.green('Done'));
+            } else {
+              console.log(chalk.red('Failed'));
+            }
+          }
+          
+          await storage.save(job);
           newJobs.push(job);
         }
       }
@@ -87,7 +100,7 @@ program
             job.jobTitle.substring(0, 30),
             job.company.substring(0, 20),
             job.matchedSkills.join(', ').substring(0, 20),
-            job.jobUrl.substring(0, 30) + '...'
+            job.url.substring(0, 30) + '...'
           ]);
         });
 
