@@ -5,36 +5,42 @@ class LinkedinScraper extends BaseScraper {
     const jobs = [];
     const encodedKeyword = encodeURIComponent(keyword);
     const encodedLocation = encodeURIComponent(location);
-    // Use the public jobs search URL
-    const url = `https://www.linkedin.com/jobs/search?keywords=${encodedKeyword}&location=${encodedLocation}&geoId=102713980&f_TPR=r86400&position=1&pageNum=0`;
+    const pages = [0, 25]; // First 2 pages (25 jobs per page)
+    
+    for (const start of pages) {
+      const url = `https://www.linkedin.com/jobs/search?keywords=${encodedKeyword}&location=${encodedLocation}&geoId=102713980&f_TPR=r86400&start=${start}`;
 
-    console.log(`Scraping LinkedIn for ${keyword} in ${location}...`);
-    const $ = await this.fetch(url, false); // Try fast fetch first
+      console.log(`Scraping LinkedIn page ${start / 25 + 1}...`);
+      const $ = await this.fetch(url, false);
 
-    if (!$) {
-      console.log('Failed to fetch LinkedIn jobs page.');
-      return jobs;
+      if (!$) {
+        console.log(`Failed to fetch LinkedIn jobs page at start=${start}.`);
+        continue;
+      }
+
+      // Parse the jobs from the HTML
+      $('.jobs-search__results-list li').each((index, element) => {
+        const jobTitle = $(element).find('.base-search-card__title').text().trim();
+        const company = $(element).find('.base-search-card__subtitle').text().trim();
+        const jobLocation = $(element).find('.job-search-card__location').text().trim();
+        const jobUrl = $(element).find('.base-card__full-link').attr('href');
+        
+        if (jobTitle && company && jobUrl) {
+          jobs.push({
+            jobTitle,
+            company,
+            location: jobLocation,
+            url: jobUrl.split('?')[0], // remove tracking params
+            source: 'LinkedIn'
+          });
+        }
+      });
+      
+      // Small delay between pages
+      if (start === 0) await new Promise(r => setTimeout(r, 2000));
     }
 
-    // Parse the jobs from the HTML
-    $('.jobs-search__results-list li').each((index, element) => {
-      const jobTitle = $(element).find('.base-search-card__title').text().trim();
-      const company = $(element).find('.base-search-card__subtitle').text().trim();
-      const jobLocation = $(element).find('.job-search-card__location').text().trim();
-      const jobUrl = $(element).find('.base-card__full-link').attr('href');
-      
-      if (jobTitle && company && jobUrl) {
-        jobs.push({
-          jobTitle,
-          company,
-          location: jobLocation,
-          url: jobUrl.split('?')[0], // remove tracking params
-          source: 'LinkedIn'
-        });
-      }
-    });
-
-    console.log(`Found ${jobs.length} jobs on LinkedIn.`);
+    console.log(`Found ${jobs.length} total jobs on LinkedIn.`);
     return jobs;
   }
 }

@@ -4,6 +4,10 @@ const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
 const { getStorage } = require('../storage/index');
+const { exec } = require('child_process');
+
+let isScraping = false;
+let lastScrapedAt = null;
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -65,11 +69,47 @@ app.get(INTERNAL_API_PATH, async (req, res) => {
 
   try {
     const jobs = await storage.getAllJobs();
-    res.json(jobs);
+    res.json({
+      jobs,
+      metadata: {
+        lastScrapedAt,
+        isScraping
+      }
+    });
   } catch (err) {
     console.error('Error fetching jobs:', err);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+
+app.post('/api/v1/internal/discovery/trigger_scrape', async (req, res) => {
+  const sessionToken = req.headers['x-internal-session'];
+  const expectedToken = process.env.INTERNAL_SESSION_TOKEN || 'job-discovery-secure-2026';
+  
+  if (!sessionToken || sessionToken !== expectedToken) {
+    return res.status(403).json({ error: 'Access Denied' });
+  }
+
+  if (isScraping) {
+    return res.status(409).json({ error: 'Scrape already in progress' });
+  }
+
+  isScraping = true;
+  const cliPath = path.join(__dirname, '../cli/index.js');
+  
+  console.log('Manual scrape triggered via API...');
+  
+  exec(`node "${cliPath}" run`, (error, stdout, stderr) => {
+    isScraping = false;
+    if (!error) {
+      lastScrapedAt = new Date();
+      console.log('Manual scrape completed successfully.');
+    } else {
+      console.error('Manual scrape failed:', error);
+    }
+  });
+
+  res.json({ message: 'Scrape initiated' });
 });
 
 app.listen(port, () => {

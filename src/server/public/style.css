@@ -966,6 +966,193 @@ h1 {
     text-decoration: underline;
 }
 
+/* Dashboard Layout */
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+    padding: 0;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 300px;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+}
+
+.sidebar-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar-header h1 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin: 0;
+}
+
+.sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sidebar-section label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    margin-left: 300px;
+    padding: 2.5rem;
+    max-width: 1400px;
+}
+
+.content-header {
+    margin-bottom: 2.5rem;
+}
+
+.content-header h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+}
+
+/* Sync Controls */
+.sync-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.dot.active {
+    background: var(--success);
+    box-shadow: 0 0 10px var(--success);
+}
+
+.dot.processing {
+    background: var(--accent);
+    animation: pulse 1.5s infinite;
+}
+
+/* Sidebar Buttons & Inputs */
+.btn-sidebar {
+    justify-content: flex-start;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: 1px solid transparent;
+    font-weight: 500;
+}
+
+.btn-sidebar:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-sidebar.active {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: var(--accent);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+}
+
+.stats-mini {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.stat-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.75rem 0.25rem;
+    border-radius: 12px;
+}
+
+.stat-mini .label {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.stat-mini .value {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .sidebar { width: 240px; }
+    .main-content { margin-left: 240px; }
+}
+
+@media (max-width: 768px) {
+    .app-layout { flex-direction: column; }
+    .sidebar { position: relative; width: 100%; height: auto; border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+    .main-content { margin-left: 0; padding: 1.5rem; }
+}
+
+/* Existing Components Adjustments */
+.job-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.logo-area h1 {
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.icon {
+    margin-right: 8px;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
 .copy-btn {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);

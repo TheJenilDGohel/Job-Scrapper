@@ -12,14 +12,23 @@ document.addEventListener('DOMContentLoaded', () => {
         filterAndRenderJobs();
     });
 
-    const filterBtns = document.querySelectorAll('.filter-box .btn');
+    const filterBtns = document.querySelectorAll('.btn-sidebar');
     filterBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             filterBtns.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
+            btn.classList.add('active');
+            
+            const viewTitle = document.getElementById('view-title');
+            if (viewTitle) viewTitle.textContent = btn.textContent;
+            
             filterAndRenderJobs();
         });
     });
+
+    const syncBtn = document.getElementById('sync-btn');
+    if (syncBtn) {
+        syncBtn.addEventListener('click', triggerManualScrape);
+    }
 
     const sortSelect = document.getElementById('sort-select');
     if (sortSelect) {
@@ -50,9 +59,11 @@ async function fetchJobs() {
             if (response.status === 403) throw new Error('Unauthorized: Session token invalid.');
             throw new Error('Failed to fetch jobs');
         }
-        allJobs = await response.json();
+        const data = await response.json();
+        allJobs = data.jobs || [];
         
         updateStats();
+        updateMetadata(data.metadata);
         filterAndRenderJobs();
     } catch (error) {
         console.error(error);
@@ -63,6 +74,77 @@ async function fetchJobs() {
             </div>
         `;
     }
+}
+
+function updateMetadata(meta) {
+    if (!meta) return;
+    
+    const lastUpdated = document.getElementById('last-updated');
+    const syncDot = document.getElementById('sync-dot');
+    
+    if (meta.isScraping) {
+        lastUpdated.textContent = 'Discovery in progress...';
+        syncDot.className = 'dot processing';
+    } else {
+        syncDot.className = 'dot active';
+        if (meta.lastScrapedAt) {
+            const date = new Date(meta.lastScrapedAt);
+            lastUpdated.textContent = `Last sync: ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        } else {
+            lastUpdated.textContent = 'System Active';
+        }
+    }
+}
+
+async function triggerManualScrape() {
+    const syncBtn = document.getElementById('sync-btn');
+    const originalText = syncBtn.innerHTML;
+    
+    try {
+        syncBtn.disabled = true;
+        syncBtn.innerHTML = 'Starting...';
+        
+        const response = await fetch('/api/v1/internal/discovery/trigger_scrape', {
+            method: 'POST',
+            headers: {
+                'x-internal-session': SESSION_TOKEN
+            }
+        });
+        
+        if (response.ok) {
+            syncBtn.innerHTML = 'Scraping...';
+            // Start polling for status
+            pollScrapeStatus();
+        } else {
+            const err = await response.json();
+            alert(err.error || 'Failed to start scrape');
+            syncBtn.disabled = false;
+            syncBtn.innerHTML = originalText;
+        }
+    } catch (error) {
+        console.error(error);
+        syncBtn.disabled = false;
+        syncBtn.innerHTML = originalText;
+    }
+}
+
+let statusPollInterval = null;
+function pollScrapeStatus() {
+    if (statusPollInterval) clearInterval(statusPollInterval);
+    
+    statusPollInterval = setInterval(async () => {
+        await fetchJobs();
+        const syncDot = document.getElementById('sync-dot');
+        if (syncDot && !syncDot.classList.contains('processing')) {
+            clearInterval(statusPollInterval);
+            const syncBtn = document.getElementById('sync-btn');
+            syncBtn.disabled = false;
+            syncBtn.innerHTML = `
+                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>
+                Sync Jobs Now
+            `;
+        }
+    }, 5000);
 }
 
 function updateStats() {
@@ -81,7 +163,7 @@ function updateStats() {
 function filterAndRenderJobs() {
     const searchInput = document.getElementById('search-input');
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    const activeFilterBtn = document.querySelector('.filter-box .btn.active');
+    const activeFilterBtn = document.querySelector('.btn-sidebar.active');
     const activeFilter = activeFilterBtn ? activeFilterBtn.dataset.filter : 'all';
     const sortSelect = document.getElementById('sort-select');
     const sortVal = sortSelect ? sortSelect.value : 'score-desc';

@@ -17,62 +17,90 @@
         <div class="orb orb-3"></div>
     </div>
 
-    <main class="container">
-        <header class="header">
-            <div class="logo-area">
-                <div class="logo-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                    </svg>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-area">
+                    <div class="logo-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                    </div>
+                    <h1>Job Discovery</h1>
                 </div>
-                <div>
-                    <h1>Job Discovery <span class="prod-badge">v1.0 Ready</span></h1>
-                    <p class="tagline">Autonomous Intelligence for your Career</p>
-                </div>
+                <span class="prod-badge">v1.1 Active</span>
             </div>
-            <div class="stats">
-                <div class="stat-card">
-                    <span class="stat-value" id="total-jobs">0</span>
-                    <span class="stat-label">Total Jobs</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value accent" id="avg-score">—</span>
-                    <span class="stat-label">Avg Match</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value success" id="high-matches">0</span>
-                    <span class="stat-label">Top Matches</span>
-                </div>
-            </div>
-        </header>
 
-        <section class="controls">
-            <div class="search-box">
-                <input type="text" id="search-input" placeholder="Search jobs, skills, or companies...">
+            <div class="sidebar-section">
+                <label>Intelligence Control</label>
+                <button id="sync-btn" class="btn btn-primary btn-block">
+                    <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>
+                    Sync Jobs Now
+                </button>
+                <div class="sync-status">
+                    <span class="dot" id="sync-dot"></span>
+                    <span id="last-updated">Ready to discover</span>
+                </div>
             </div>
-            <div class="filter-box">
-                <button class="btn active" data-filter="all">All Jobs</button>
-                <button class="btn" data-filter="high-score">Top Matches</button>
-                <button class="btn" data-filter="recent">Recent</button>
+
+            <div class="sidebar-section">
+                <label>Search Discovery</label>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Role, skill, company...">
+                </div>
             </div>
-            <div class="sort-box">
+
+            <div class="sidebar-section">
+                <label>Smart Filters</label>
+                <div class="filter-group">
+                    <button class="btn btn-sidebar active" data-filter="all">All Postings</button>
+                    <button class="btn btn-sidebar" data-filter="high-score">Top Matches</button>
+                    <button class="btn btn-sidebar" data-filter="recent">Recent Only</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <label>Sorting</label>
                 <select id="sort-select" class="sort-select">
                     <option value="score-desc">Highest Match</option>
                     <option value="score-asc">Lowest Match</option>
                     <option value="date-desc">Newest First</option>
-                    <option value="title-asc">Title A-Z</option>
                 </select>
             </div>
-        </section>
 
-        <section class="job-grid" id="job-grid">
-            <!-- Job cards will be injected here via JS -->
-            <div class="loading-state">
-                <div class="spinner"></div>
-                <p>Analyzing job data...</p>
+            <div class="sidebar-footer">
+                <div class="stats-mini">
+                    <div class="stat-mini">
+                        <span class="label">Total</span>
+                        <span class="value" id="total-jobs">0</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="label">Avg</span>
+                        <span class="value accent" id="avg-score">—</span>
+                    </div>
+                    <div class="stat-mini">
+                        <span class="label">Top</span>
+                        <span class="value success" id="high-matches">0</span>
+                    </div>
+                </div>
             </div>
-        </section>
-    </main>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <h2 id="view-title">All Discoveries</h2>
+                <p class="tagline">Autonomous Intelligence for your Career</p>
+            </header>
+
+            <section class="job-grid" id="job-grid">
+                <!-- Job cards will be injected here via JS -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Analyzing job data...</p>
+                </div>
+            </section>
+        </main>
+    </div>
 
     <footer class="footer">
         <div class="footer-inner">
