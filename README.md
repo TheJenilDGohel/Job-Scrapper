@@ -1,6 +1,5 @@
 # 🚀 Autonomous Job Discovery Engine v1.1
 
-![Autonomous Dashboard Visualization](C:\Users\devje\.gemini\antigravity\brain\cc43d679-59ba-4f1a-9ad7-13b07f3a5e63\job_discovery_dashboard_premium_1777021641684.png)
 
 > **Autonomous Intelligence for the Modern Developer.** 
 > This engine doesn't just scrape; it analyzes, scores, and delivers high-fidelity job opportunities for **Mobile & Flutter** roles directly to your Command Center and Discord.
