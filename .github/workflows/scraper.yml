@@ -1,0 +1,45 @@
+name: Autonomous Job Scraper
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Every 6 hours
+  workflow_dispatch: # Manual trigger from GitHub UI
+
+jobs:
+  scrape:
+    name: Run Scraper Engine
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Scraper & Matching
+        run: npm run cli -- --location "India"
+        env:
+          # Essential Database Config
+          STORAGE_TYPE: "supabase"
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          
+          # Notifications
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          
+          # Engine Settings
+          LOG_LEVEL: "info"
+          MAX_RETRIES: "3"
+          INTERNAL_SESSION_TOKEN: ${{ secrets.INTERNAL_SESSION_TOKEN }}
+
+      - name: Keep-Alive Logs
+        run: |
+          echo "Scrape completed at $(date)"
+          echo "Supabase activity pinged to prevent auto-pause."

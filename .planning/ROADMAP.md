@@ -52,10 +52,10 @@
   - [x] Add geography parameter to scrapers
   - [x] Target Indian job boards/locations by default
   - [x] Update CLI with `--location` flag
-- [ ] **Phase 12: Production Hardening** (Next)
-  - [ ] Implement robust error handling for rate limits
-  - [ ] Add basic auth to dashboard
-  - [ ] Create deployment script for cloud hosting (e.g. Railway/Heroku)
+- [x] **Phase 12: Production Hardening** (Completed)
+  - [x] Implement robust error handling for rate limits
+  - [x] Add basic auth to dashboard
+  - [x] Create deployment script for cloud hosting (e.g. Railway/Heroku)
 
 - [x] **Phase 13: UI/UX Premium Overhaul** (Completed)
   - [x] Apply glassmorphism and modern design tokens
@@ -127,3 +127,24 @@
 - Full Job Descriptions extracted for matches.
 - Contact emails and company URLs detected.
 - Dashboard updated with detailed views.
+
+### Phase 10: Supabase Transition
+**Goal:** Migrate to Supabase for production.
+**Success Criteria:**
+- Supabase storage adapter functional.
+- Storage factory handles environment-based switching.
+- Production environment variables configured.
+
+### Phase 11: Market Localization
+**Goal:** Target Indian job markets and localize scrapers.
+**Success Criteria:**
+- Geography parameter added to scrapers.
+- Default search targets Indian cities/regions.
+- CLI supports --location flag.
+
+### Phase 12: Production Hardening
+**Goal:** Secure the application and prepare for production deployment.
+**Success Criteria:**
+- Robust error handling for rate limits and scraper failures.
+- Secure session-based authentication for the dashboard.
+- Deployment configuration for cloud hosting.

@@ -1,0 +1,15 @@
+services:
+  dashboard:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: always
+
+  cron-worker:
+    build: .
+    command: ["node", "src/automation/cron.js"]
+    env_file:
+      - .env
+    restart: always
