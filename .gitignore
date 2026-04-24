@@ -4,6 +4,7 @@ node_modules/
 .claude/
 data/
 *.png
+!docs/*.png
 *.jpg
 *.sqlite
 logs/

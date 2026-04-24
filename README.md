@@ -2,7 +2,7 @@
 
 > A premium, autonomous job discovery system that crawls the web, parses your CV, and finds your perfect career match using AI-driven scoring.
 
-![Dashboard Preview](https://raw.githubusercontent.com/TheJenilDGohel/Job-Discovery-Engine/main/docs/preview.png)
+![Dashboard Preview](./docs/preview.png)
 
 ## 🚀 Key Features
 
