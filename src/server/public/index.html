@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autonomous Job Discovery Engine</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="AI-powered autonomous job discovery engine. Smart matching, deep intelligence scraping, and real-time career alerts.">
+    <meta name="theme-color" content="#020617">
+    <title>Job Discovery — Autonomous Intelligence for your Career</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,13 +20,28 @@
     <main class="container">
         <header class="header">
             <div class="logo-area">
-                <div class="logo-icon">JD</div>
-                <h1>Job Discovery Engine</h1>
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h1>Job Discovery</h1>
+                    <p class="tagline">Autonomous Intelligence for your Career</p>
+                </div>
             </div>
             <div class="stats">
                 <div class="stat-card">
                     <span class="stat-value" id="total-jobs">0</span>
-                    <span class="stat-label">Total Jobs Found</span>
+                    <span class="stat-label">Total Jobs</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value accent" id="avg-score">—</span>
+                    <span class="stat-label">Avg Match</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value success" id="high-matches">0</span>
+                    <span class="stat-label">Top Matches</span>
                 </div>
             </div>
         </header>
@@ -34,7 +52,16 @@
             </div>
             <div class="filter-box">
                 <button class="btn active" data-filter="all">All Jobs</button>
-                <button class="btn" data-filter="high-score">Top Matches (>60)</button>
+                <button class="btn" data-filter="high-score">Top Matches</button>
+                <button class="btn" data-filter="recent">Recent</button>
+            </div>
+            <div class="sort-box">
+                <select id="sort-select" class="sort-select">
+                    <option value="score-desc">Highest Match</option>
+                    <option value="score-asc">Lowest Match</option>
+                    <option value="date-desc">Newest First</option>
+                    <option value="title-asc">Title A-Z</option>
+                </select>
             </div>
         </section>
 
@@ -46,6 +73,33 @@
             </div>
         </section>
     </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <span class="footer-brand">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                Job Discovery Engine
+            </span>
+            <span class="footer-status" id="last-updated">Autonomous Intelligence Active</span>
+        </div>
+    </footer>
+
+    <!-- Modal for Job Details -->
+    <div id="job-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="close-modal-btn" aria-label="Close modal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div id="modal-body">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
