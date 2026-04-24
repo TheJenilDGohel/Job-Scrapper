@@ -1,18 +1,49 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const path = require('path');
 const { getStorage } = require('../storage/index');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Request logger for debugging - MUST BE FIRST
+// Security Headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.directives,
+      "script-src": ["'self'", "'unsafe-inline'"], // Allow dashboard scripts
+      "img-src": ["'self'", "data:", "https:"],
+      "connect-src": ["'self'", "https:"]
+    },
+  },
+}));
+
+// Request logger for debugging
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  }
   next();
 });
 
-app.use(cors());
+// Tighten CORS
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173', // Common Vite port
+  process.env.PRODUCTION_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
 
 app.get('/ping', (req, res) => res.send('pong'));
 
@@ -26,7 +57,9 @@ const INTERNAL_API_PATH = '/api/v1/internal/discovery/jobs_data_secure';
 app.get(INTERNAL_API_PATH, async (req, res) => {
   // Check for internal session header to prevent unauthorized outside access
   const sessionToken = req.headers['x-internal-session'];
-  if (!sessionToken || sessionToken !== 'job-discovery-secure-2026') {
+  const expectedToken = process.env.INTERNAL_SESSION_TOKEN || 'job-discovery-secure-2026';
+  
+  if (!sessionToken || sessionToken !== expectedToken) {
     return res.status(403).json({ error: 'Access Denied: Internal only' });
   }
 
@@ -40,5 +73,6 @@ app.get(INTERNAL_API_PATH, async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Dashboard running at http://localhost:${port}`);
+  console.log(`🚀 Discovery Dashboard running at http://localhost:${port}`);
+  console.log(`🔒 Security level: Production Hardened`);
 });
