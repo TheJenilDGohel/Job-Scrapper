@@ -32,17 +32,17 @@ A distributed, multi-source intelligence tool for job hunting. It uses smart agg
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] PDF CV Parsing (extract skills, roles, experience)
+- [x] Job Aggregator (LinkedIn public search, Indeed, Wellfound, Career pages)
+- [x] Scraper Engine (axios, cheerio, puppeteer, anti-block measures)
+- [x] Matching Engine (weighted scoring, keyword matching)
+- [x] Storage (JSON/SQLite)
+- [x] Output System (CLI / Dashboard / Telegram alerts)
+- [x] Automation (cron jobs)
 
 ### Active
 
-- [ ] PDF CV Parsing (extract skills, roles, experience)
-- [ ] Job Aggregator (LinkedIn public search, Indeed, Wellfound, Career pages)
-- [ ] Scraper Engine (axios, cheerio, puppeteer, anti-block measures)
-- [ ] Matching Engine (weighted scoring, keyword matching)
-- [ ] Storage (JSON/SQLite)
-- [ ] Output System (CLI / Dashboard / Telegram alerts)
-- [ ] Automation (cron jobs)
+(None - Milestone 2 Complete)
 
 ### Out of Scope
 
@@ -51,4 +51,4 @@ A distributed, multi-source intelligence tool for job hunting. It uses smart agg
 - Auto-apply (deferred to later scaling)
 
 ---
-*Last updated: 2026-04-22 after initialization*
+*Last updated: 2026-04-23 after Milestone 2 Completion*
