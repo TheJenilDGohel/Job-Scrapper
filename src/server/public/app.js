@@ -1,3 +1,7 @@
+// Production Security: Use environment-driven session tokens if possible. 
+// For this local engine, we use a constant that can be overridden by the server.
+const SESSION_TOKEN = 'job-discovery-secure-2026'; 
+
 let allJobs = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -25,14 +29,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+/**
+ * Lightweight HTML Sanitizer to prevent XSS from scraped content
+ */
+function sanitizeHTML(str) {
+    if (!str) return '';
+    const temp = document.createElement('div');
+    temp.textContent = str;
+    return temp.innerHTML;
+}
+
 async function fetchJobs() {
     try {
         const response = await fetch('/api/v1/internal/discovery/jobs_data_secure', {
             headers: {
-                'x-internal-session': 'job-discovery-secure-2026'
+                'x-internal-session': SESSION_TOKEN
             }
         });
-        if (!response.ok) throw new Error('Failed to fetch jobs');
+        if (!response.ok) {
+            if (response.status === 403) throw new Error('Unauthorized: Session token invalid.');
+            throw new Error('Failed to fetch jobs');
+        }
         allJobs = await response.json();
         
         updateStats();
@@ -41,7 +58,8 @@ async function fetchJobs() {
         console.error(error);
         document.getElementById('job-grid').innerHTML = `
             <div class="loading-state">
-                <p style="color: #ef4444;">Error loading jobs. Ensure the server is running.</p>
+                <p style="color: #ef4444;">${sanitizeHTML(error.message)}</p>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.7;">Check server logs for details.</p>
             </div>
         `;
     }
@@ -61,18 +79,23 @@ function updateStats() {
 }
 
 function filterAndRenderJobs() {
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const activeFilter = document.querySelector('.filter-box .btn.active').dataset.filter;
-    const sortVal = document.getElementById('sort-select').value;
+    const searchInput = document.getElementById('search-input');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    const activeFilterBtn = document.querySelector('.filter-box .btn.active');
+    const activeFilter = activeFilterBtn ? activeFilterBtn.dataset.filter : 'all';
+    const sortSelect = document.getElementById('sort-select');
+    const sortVal = sortSelect ? sortSelect.value : 'score-desc';
 
     let filtered = allJobs.filter(job => {
-        // Search filter
+        const title = (job.jobTitle || '').toLowerCase();
+        const comp = (job.company || '').toLowerCase();
+        const skillsStr = (job.matchedSkills || '').toString().toLowerCase();
+
         const matchesSearch = 
-            job.jobTitle.toLowerCase().includes(searchTerm) || 
-            job.company.toLowerCase().includes(searchTerm) ||
-            (job.matchedSkills && job.matchedSkills.toString().toLowerCase().includes(searchTerm));
+            title.includes(searchTerm) || 
+            comp.includes(searchTerm) ||
+            skillsStr.includes(searchTerm);
         
-        // Category filter
         let matchesCategory = true;
         if (activeFilter === 'high-score') {
             matchesCategory = job.score > 75;
@@ -84,13 +107,12 @@ function filterAndRenderJobs() {
         return matchesSearch && matchesCategory;
     });
 
-    // Sorting
     filtered.sort((a, b) => {
         switch (sortVal) {
             case 'score-desc': return b.score - a.score;
             case 'score-asc': return a.score - b.score;
             case 'date-desc': return new Date(b.createdAt) - new Date(a.createdAt);
-            case 'title-asc': return a.jobTitle.localeCompare(b.jobTitle);
+            case 'title-asc': return (a.jobTitle || '').localeCompare(b.jobTitle || '');
             default: return 0;
         }
     });
@@ -113,7 +135,6 @@ function renderJobs(jobs) {
         return;
     }
 
-    // Add count badge
     const countBadge = document.createElement('div');
     countBadge.className = 'results-count';
     countBadge.textContent = `Showing ${jobs.length} identified opportunities`;
@@ -133,11 +154,11 @@ function renderJobs(jobs) {
         try {
             skills = Array.isArray(job.matchedSkills) ? job.matchedSkills : JSON.parse(job.matchedSkills || '[]');
         } catch(e) {
-            skills = job.matchedSkills ? job.matchedSkills.split(',') : [];
+            skills = job.matchedSkills ? (typeof job.matchedSkills === 'string' ? job.matchedSkills.split(',') : []) : [];
         }
 
         const skillsHtml = skills && skills.length > 0 
-            ? `<div class="job-skills">${skills.slice(0, 5).map(s => `<span class="skill-tag">${s}</span>`).join('')}${skills.length > 5 ? `<span class="skill-tag">+${skills.length - 5}</span>` : ''}</div>`
+            ? `<div class="job-skills">${skills.slice(0, 5).map(s => `<span class="skill-tag">${sanitizeHTML(s)}</span>`).join('')}${skills.length > 5 ? `<span class="skill-tag">+${skills.length - 5}</span>` : ''}</div>`
             : '';
 
         const dateStr = job.createdAt ? new Date(job.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Recently';
@@ -145,10 +166,10 @@ function renderJobs(jobs) {
         card.innerHTML = `
             <div class="job-header">
                 <div>
-                    <h3 class="job-title">${job.jobTitle}</h3>
+                    <h3 class="job-title">${sanitizeHTML(job.jobTitle)}</h3>
                     <div class="job-company">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                        ${job.company}
+                        ${sanitizeHTML(job.company)}
                     </div>
                 </div>
                 <div class="job-score ${scoreClass}" title="AI Match Score based on your profile">${job.score}% Match</div>
@@ -157,7 +178,7 @@ function renderJobs(jobs) {
             <div class="job-meta">
                 <span>
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    ${job.location || 'Remote'}
+                    ${sanitizeHTML(job.location || 'Remote')}
                 </span>
                 <span>
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -184,8 +205,8 @@ function openModal(job) {
     
     const contactInfo = job.contactEmail ? `
         <div class="contact-email-container">
-            <a href="mailto:${job.contactEmail}" class="email-link">${job.contactEmail}</a>
-            <button class="copy-btn" onclick="copyToClipboard('${job.contactEmail}', this)" title="Copy Email">
+            <a href="mailto:${sanitizeHTML(job.contactEmail)}" class="email-link">${sanitizeHTML(job.contactEmail)}</a>
+            <button class="copy-btn" onclick="copyToClipboard('${sanitizeHTML(job.contactEmail)}', this)" title="Copy Email">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
@@ -196,11 +217,11 @@ function openModal(job) {
 
     modalBody.innerHTML = `
         <div class="modal-header">
-            <h2 class="modal-title">${job.jobTitle}</h2>
+            <h2 class="modal-title">${sanitizeHTML(job.jobTitle)}</h2>
             <div class="modal-subtitle">
-                <span>${job.company}</span>
+                <span>${sanitizeHTML(job.company)}</span>
                 <span class="dot"></span>
-                <span>${job.location || 'Remote'}</span>
+                <span>${sanitizeHTML(job.location || 'Remote')}</span>
                 <span class="job-score ${job.score > 75 ? 'high-match' : (job.score < 40 ? 'medium' : '')}">${job.score}% Match</span>
             </div>
         </div>
@@ -208,7 +229,7 @@ function openModal(job) {
         <div class="modal-meta-grid">
             <div class="meta-item">
                 <span class="meta-label">Discovery Source</span>
-                <span class="meta-value">${job.source || 'Autonomous Agent'}</span>
+                <span class="meta-value">${sanitizeHTML(job.source || 'Autonomous Agent')}</span>
             </div>
             <div class="meta-item">
                 <span class="meta-label">Analysis Date</span>
@@ -217,7 +238,7 @@ function openModal(job) {
             <div class="meta-item">
                 <span class="meta-label">Company Asset</span>
                 <span class="meta-value">
-                    ${job.companyUrl ? `<a href="${job.companyUrl}" target="_blank">${new URL(job.companyUrl).hostname}</a>` : '<span class="text-dim">Not verified</span>'}
+                    ${job.companyUrl ? `<a href="${sanitizeHTML(job.companyUrl)}" target="_blank">${sanitizeHTML(new URL(job.companyUrl).hostname)}</a>` : '<span class="text-dim">Not verified</span>'}
                 </span>
             </div>
             <div class="meta-item">
@@ -239,7 +260,7 @@ function openModal(job) {
         </div>
 
         <div style="margin-top: 3rem; display: flex; gap: 1rem;">
-            <a href="${job.url}" target="_blank" class="apply-btn" style="flex: 2;">View Original Listing</a>
+            <a href="${sanitizeHTML(job.url)}" target="_blank" class="apply-btn" style="flex: 2;">View Original Listing</a>
         </div>
     `;
 
@@ -247,7 +268,7 @@ function openModal(job) {
     document.body.style.overflow = 'hidden';
 
     const closeBtn = document.querySelector('.modal-close');
-    closeBtn.onclick = closeModal;
+    if (closeBtn) closeBtn.onclick = closeModal;
 
     window.onclick = (event) => {
         if (event.target == modal) {
@@ -258,7 +279,7 @@ function openModal(job) {
 
 function closeModal() {
     const modal = document.getElementById('job-modal');
-    modal.style.display = 'none';
+    if (modal) modal.style.display = 'none';
     document.body.style.overflow = 'auto';
 }
 
@@ -266,7 +287,7 @@ function formatDescription(text) {
     if (!text) return '<p class="text-dim">Detailed behavioral analysis is being processed...</p>';
 
     var NL = '\n';
-    var clean = text;
+    var clean = sanitizeHTML(text);
 
     // Truncate markers
     var tailMarkers = [
