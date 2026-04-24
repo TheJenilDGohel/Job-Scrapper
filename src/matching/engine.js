@@ -33,10 +33,12 @@ class MatchingEngine {
     // We assume the scraped job hasn't parsed skills yet, so we search the title for now
     // In a real scenario, we'd scrape the job description and search that.
     let skillScore = 0;
+    const contentToSearch = (jobTitleLower + ' ' + (job.description || '').toLowerCase());
+    
     if (this.userProfile.skills && this.userProfile.skills.length > 0) {
       const pointPerSkill = 50 / this.userProfile.skills.length;
       for (const skill of this.userProfile.skills) {
-        if (jobTitleLower.includes(skill.toLowerCase())) {
+        if (contentToSearch.includes(skill.toLowerCase())) {
           skillScore += pointPerSkill;
           matchedSkills.push(skill);
         }
@@ -60,9 +62,19 @@ class MatchingEngine {
     }
     score += experienceScore;
 
+    // Premium Boost: Flutter/Mobile Focus (User Request)
+    if (jobTitleLower.includes('flutter') || jobTitleLower.includes('dart')) {
+      score += 15;
+    } else if (jobTitleLower.includes('mobile') || jobTitleLower.includes('ios') || jobTitleLower.includes('android')) {
+      score += 10;
+    }
+
+    // Cap score at 100
+    const finalScore = Math.min(100, Math.round(score));
+
     return {
       ...job,
-      score: Math.round(score),
+      score: finalScore,
       matchedSkills
     };
   }

@@ -32,9 +32,12 @@ program
       } catch (err) {
         console.log(chalk.red(`Failed to read CV at ${options.cv}, using fallback profile.`));
         userProfile = {
-          skills: ['javascript', 'react', 'node', 'express'],
-          roles: ['Software Engineer', 'Full Stack Developer', 'Frontend Developer'],
-          experience: 2
+          roles: [
+            'flutter developer', 'mobile app developer', 'ios developer', 
+            'android developer', 'dart developer', 'flutter lead'
+          ],
+          skills: ['flutter', 'dart', 'ios', 'android', 'firebase', 'mobile development'],
+          experience: 1
         };
       }
       console.log(chalk.green('Profile built successfully!'));
@@ -56,26 +59,31 @@ program
         const wfJobs = await wellfound.scrapeJobs(role, options.location);
         allJobs = allJobs.concat(liJobs, wfJobs);
       }
-
-      console.log(chalk.green(`Found ${allJobs.length} potential jobs.`));
-
-      // 4. Match & Rank
-      console.log(chalk.yellow('\n[4] Scoring & Ranking...'));
+      
+      // 4. Matching & Scoring
+      console.log(chalk.yellow('\n[4] Intelligent Matching...'));
       const engine = new MatchingEngine(userProfile);
-      const rankedJobs = engine.rankJobs(allJobs);
-
-      // 5. Save & Output
-      console.log(chalk.yellow('\n[5] Saving & Displaying Results...'));
+      
+      // Filter out duplicates and score
+      const uniqueJobs = Array.from(new Map(allJobs.map(item => [item.url, item])).values());
+      const matchedJobs = engine.rankJobs(uniqueJobs);
+      
+      // 5. Deep Scrape High Matches (Intelligence Layer)
+      console.log(chalk.yellow('\n[5] Deep Discovery (Analyzing High-Quality Matches)...'));
       const newJobs = [];
-      for (const job of rankedJobs) {
-        if (!(await storage.exists(job.url))) {
-          // Deep scrape for high-potential jobs
-          if (job.score > 40) {
-            process.stdout.write(chalk.dim(`  - Deep scraping: ${job.jobTitle.substring(0, 20)}... `));
-            const scraper = job.source === 'LinkedIn' ? linkedin : wellfound;
-            const details = await scraper.getJobDetails(job.url, job.company);
+      for (const job of matchedJobs) {
+        // Only save if not already in storage
+        const alreadyExists = await storage.exists(job.url);
+        if (!alreadyExists) {
+          // If score is decent, try to get more info
+          if (job.score >= 40) {
+            console.log(chalk.dim(`- Deep scraping: ${job.jobTitle} @ ${job.company}... `));
+            const details = await linkedin.getJobDetails(job.url);
             if (details) {
               Object.assign(job, details);
+              // Re-score with description
+              const updatedJob = engine.scoreJob(job);
+              Object.assign(job, updatedJob);
               console.log(chalk.green('Done'));
             } else {
               console.log(chalk.red('Failed'));
@@ -99,7 +107,7 @@ program
             job.score.toString(),
             job.jobTitle.substring(0, 30),
             job.company.substring(0, 20),
-            job.matchedSkills.join(', ').substring(0, 20),
+            (job.matchedSkills || []).join(', ').substring(0, 20),
             job.url.substring(0, 30) + '...'
           ]);
         });
@@ -108,7 +116,18 @@ program
 
         // 6. Notify
         const notifier = new NotificationService();
-        await notifier.notify(newJobs.filter(j => j.score > 50));
+        // Notify only if score is high AND it's a mobile role
+        const alertJobs = newJobs.filter(j => {
+          const isMobile = j.jobTitle.toLowerCase().includes('flutter') || 
+                           j.jobTitle.toLowerCase().includes('mobile') ||
+                           j.jobTitle.toLowerCase().includes('ios') ||
+                           j.jobTitle.toLowerCase().includes('android');
+          return j.score > 70 || (isMobile && j.score > 50);
+        });
+        
+        if (alertJobs.length > 0) {
+          await notifier.notify(alertJobs);
+        }
       } else {
         console.log('No new jobs found this run.');
       }

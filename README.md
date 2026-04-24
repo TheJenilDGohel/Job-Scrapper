@@ -1,10 +1,17 @@
-# 🔍 Job Discovery Engine — Autonomous Intelligence
+# 🚀 Autonomous Job Discovery Engine v1.1
 
-> A premium, autonomous job discovery system that crawls the web, parses your CV, and finds your perfect career match using AI-driven scoring.
+![Autonomous Dashboard Visualization](C:\Users\devje\.gemini\antigravity\brain\cc43d679-59ba-4f1a-9ad7-13b07f3a5e63\job_discovery_dashboard_premium_1777021641684.png)
 
-![Dashboard Preview](./docs/preview.png)
+> **Autonomous Intelligence for the Modern Developer.** 
+> This engine doesn't just scrape; it analyzes, scores, and delivers high-fidelity job opportunities for **Mobile & Flutter** roles directly to your Command Center and Discord.
 
-## 🚀 Key Features
+## 🌟 Key Updates in v1.1
+- **Deep Discovery Depth**: Increased LinkedIn search depth to 4 pages per role (100+ jobs) to ensure 24/7 volume.
+- **Flutter & Mobile Intelligence**: Enhanced matching engine with specialized scoring boosts for Dart, Flutter, and Mobile platforms.
+- **Smart Notification Tiering**: Discord alerts are now strictly scoped to high-matching roles (70%+) or relevant Mobile/Flutter positions (50%+).
+- **Stabilized Command Center**: Fixed layout regressions and overflow issues for a seamless dashboard experience on all screen sizes.
+
+## 🧠 Core Features
 
 *   **🧠 CV Intelligence**: Automatically parses PDF resumes and builds a structured skill/role profile.
 *   **🕷️ Autonomous Crawling**: Multi-source scraping (LinkedIn, Wellfound, etc.) with anti-blocking logic.
@@ -83,7 +90,7 @@ npm run cli -- --location "India"
 ```
 
 ### ⏰ Automation (Cron)
-Start the background worker (runs every 6 hours):
+Start the background worker (runs every 1 hour):
 ```bash
 npm run cron
 ```
@@ -102,7 +109,7 @@ docker-compose up -d --build
 ## ☁️ 24/7 Cloud Deployment (Free)
 
 ### 1. Scraper Automation (GitHub Actions)
-The scraper is configured to run every 6 hours automatically. This keeps your Supabase database active and your job list fresh without needing a dedicated server.
+The scraper is configured to run every hour automatically via GitHub Actions. This keeps your Supabase database active (preventing it from pausing due to inactivity) and ensures your job list is always fresh.
 
 1. Push this code to a **GitHub Repository**.
 2. Go to **Settings > Secrets and Variables > Actions**.

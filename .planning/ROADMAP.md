@@ -65,8 +65,8 @@
     - [x] Update cron to hourly + startup run
     - [x] Implement Sidebar "Command Center" UI
     - [x] Add "Manual Refresh" trigger with background sync
-    - [x] Increase scraper depth (2+ pages) to UI
-  - [ ] Optimize UI layout with a Sidebar and Filter system
+    - [x] Increase scraper depth (4+ pages) for maximum volume
+    - [x] Optimize UI layout with Sidebar and Filter system
 
 ### Phase 13: UI/UX Premium Overhaul
 **Goal:** Transform the dashboard into a high-end, premium experience.

@@ -8,8 +8,8 @@ class CvParser {
       'node.js', 'react', 'python', 'java', 'c++', 'sql', 'firebase', 'mongodb'
     ];
     this.knownRoles = [
-      'mobile app developer', 'frontend developer', 'backend developer',
-      'full stack developer', 'flutter developer', 'ios developer', 'android developer'
+      'mobile app developer', 'flutter developer', 'react native developer',
+      'ios developer', 'android developer', 'frontend developer'
     ];
     this.knownKeywords = [
       'api', 'rest api', 'ui', 'ux', 'performance', 'ci/cd', 'agile', 'git'

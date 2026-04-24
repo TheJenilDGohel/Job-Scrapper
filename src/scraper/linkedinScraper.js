@@ -5,7 +5,7 @@ class LinkedinScraper extends BaseScraper {
     const jobs = [];
     const encodedKeyword = encodeURIComponent(keyword);
     const encodedLocation = encodeURIComponent(location);
-    const pages = [0, 25]; // First 2 pages (25 jobs per page)
+    const pages = [0, 25, 50, 75]; // First 4 pages (100 jobs total)
     
     for (const start of pages) {
       const url = `https://www.linkedin.com/jobs/search?keywords=${encodedKeyword}&location=${encodedLocation}&geoId=102713980&f_TPR=r86400&start=${start}`;

@@ -184,6 +184,14 @@ function filterAndRenderJobs() {
         } else if (activeFilter === 'recent') {
             const daysAgo = (new Date() - new Date(job.createdAt)) / (1000 * 60 * 60 * 24);
             matchesCategory = daysAgo <= 2;
+        } else if (activeFilter === 'mobile') {
+            const desc = (job.description || '').toLowerCase();
+            matchesCategory = title.includes('flutter') || 
+                              title.includes('mobile') || 
+                              title.includes('ios') || 
+                              title.includes('android') ||
+                              desc.includes('flutter') ||
+                              desc.includes('dart');
         }
 
         return matchesSearch && matchesCategory;
@@ -217,10 +225,10 @@ function renderJobs(jobs) {
         return;
     }
 
-    const countBadge = document.createElement('div');
-    countBadge.className = 'results-count';
-    countBadge.textContent = `Showing ${jobs.length} identified opportunities`;
-    grid.appendChild(countBadge);
+    const countContainer = document.getElementById('results-count-container');
+    if (countContainer) {
+        countContainer.innerHTML = `<div class="results-count">Showing ${jobs.length} identified opportunities</div>`;
+    }
 
     jobs.forEach((job, index) => {
         const card = document.createElement('div');

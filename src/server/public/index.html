@@ -33,7 +33,7 @@
 
             <div class="sidebar-section">
                 <label>Intelligence Control</label>
-                <button id="sync-btn" class="btn btn-primary btn-block">
+                <button id="sync-btn" class="btn btn-sidebar btn-block" style="background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3); color: var(--accent); margin-bottom: 0.5rem; justify-content: center;">
                     <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"></path></svg>
                     Sync Jobs Now
                 </button>
@@ -54,6 +54,7 @@
                 <label>Smart Filters</label>
                 <div class="filter-group">
                     <button class="btn btn-sidebar active" data-filter="all">All Postings</button>
+                    <button class="btn btn-sidebar" data-filter="mobile">Mobile & Flutter</button>
                     <button class="btn btn-sidebar" data-filter="high-score">Top Matches</button>
                     <button class="btn btn-sidebar" data-filter="recent">Recent Only</button>
                 </div>
@@ -89,7 +90,10 @@
         <main class="main-content">
             <header class="content-header">
                 <h2 id="view-title">All Discoveries</h2>
-                <p class="tagline">Autonomous Intelligence for your Career</p>
+                <div class="header-meta">
+                    <p class="tagline">Autonomous Intelligence for your Career</p>
+                    <div id="results-count-container"></div>
+                </div>
             </header>
 
             <section class="job-grid" id="job-grid">
