@@ -1,54 +1,42 @@
 # Local Job Discovery Engine
 
 ## Core Value
-A Node.js-based local job discovery engine that automatically reads a CV, extracts skills/roles, aggregates jobs from multiple sources (LinkedIn public, Indeed, wellfound, career pages), and scores/ranks them, sending alerts.
+A Node.js-based local job discovery engine that automatically reads a CV, extracts skills/roles, aggregates jobs from multiple sources, and scores/ranks them for a premium dashboard experience.
+**Crucially, this platform is architected to be Zero-Dependency and Local-First**, ensuring 100% production uptime by eliminating reliance on third-party cloud databases or paid APIs for core functionality.
 
-## What This Is
-A distributed, multi-source intelligence tool for job hunting. It uses smart aggregation rather than aggressive scraping.
+## 🏁 Current State (v1.1)
+- **Status**: Shipped & Production Ready (Local-First).
+- **Key Tech**: Node.js, Express, SQLite, Puppeteer, Discord (Optional).
+- **Archive**: [v4.0-MILESTONE-AUDIT.md](milestones/v4.0-MILESTONE-AUDIT.md)
 
-## What This Is Not
-- A tool that breaks limits or uses logged-in scraping aggressively (to avoid IP bans).
-- A web app with complex user management (starts as a CLI/simple local tool).
+## 🎯 Next Milestone Goals
+- Future roadmap planning (Market Expansion, Multi-Profile support, Analytics).
 
-## Target Audience
-- Developers (initially the creator) looking for automated job hunting.
-
-## Success Criteria
-- Accurately parses PDF CVs.
-- Aggregates jobs from multiple sources without getting blocked.
-- Scores jobs intelligently based on skills/experience.
-- Delivers ranked job matches via CLI, simple Dashboard, or Telegram alerts.
-
-## Key Decisions
+## Key Decisions (v1.1)
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Use `pdf-parse` | Easy local CV parsing | Pending |
-| Multi-source aggregation | Avoid aggressive scraping of single site to prevent bans | Pending |
-| Node.js + Axios + Cheerio | Fast scraping | Pending |
-| Puppeteer as fallback | Needed for JS-heavy pages | Pending |
-| Storage: JSON then SQLite | Start simple, upgrade to SQLite when needed | Pending |
+| Zero-Dependency Architecture | Eliminate production "issues" caused by third-party service limits/downtime/billing | Verified |
+| SQLite Primary Storage | Zero-cost, zero-latency, full ownership of data | Implemented |
+| Local CV Intelligence | No data leaves the user's machine during parsing | Verified |
+| Local-First Notifications | System works even without an internet connection (via console/logs) | Implemented |
+| Optional AI Layer | Premium features (Tailoring) are available but not required for core operation | Implemented |
+| Glassmorphism UI | Premium aesthetic for developer-centric UX | Delivered |
 
 ## Requirements
 
-### Validated
-
-- [x] PDF CV Parsing (extract skills, roles, experience)
-- [x] Job Aggregator (LinkedIn public search, Indeed, Wellfound, Career pages)
-- [x] Scraper Engine (axios, cheerio, puppeteer, anti-block measures)
-- [x] Matching Engine (weighted scoring, keyword matching)
-- [x] Storage (JSON/SQLite)
-- [x] Output System (CLI / Dashboard / Telegram alerts)
-- [x] Automation (cron jobs)
+### Validated (v1.1)
+- [x] PDF CV Parsing & Profile Extraction
+- [x] Multi-Source Job Scraper (LinkedIn, Wellfound)
+- [x] Weighted Matching Engine (Skills/Roles/Exp)
+- [x] Hybrid Storage (Local SQLite + Cloud Supabase)
+- [x] Hourly Background Automation
+- [x] Premium Dashboard with Command Center
+- [x] Application Tracking (Kanban)
+- [x] AI Resume Tailoring (Gemini)
+- [x] Browser Native Discovery (Chrome Extension)
 
 ### Active
-
-(None - Milestone 2 Complete)
-
-### Out of Scope
-
-- Resume auto-tailoring per job (deferred to later scaling)
-- Cover letter generator (deferred to later scaling)
-- Auto-apply (deferred to later scaling)
+(Ideating Milestone 5)
 
 ---
-*Last updated: 2026-04-23 after Milestone 2 Completion*
+*Last updated: 2026-04-25 after v1.1 Release*

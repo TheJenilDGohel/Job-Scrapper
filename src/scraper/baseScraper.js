@@ -115,8 +115,22 @@ class BaseScraper {
       descriptionText = $('body').text().trim().replace(/[ \t]+/g, ' ');
     }
 
-    const emailRegex = /[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+/gi;
-    const emailsFound = descriptionText.match(emailRegex) || [];
+    // Advanced Email Extraction (Handles Obfuscation)
+    const emailRegex = /([a-zA-Z0-9._-]+)\s*(?:@|\[at\]|\(at\)|\{at\}|\s+at\s+)\s*([a-zA-Z0-9._-]+)\s*(?:\.|\[dot\]|\(dot\)|\{dot\}|\s+dot\s+)\s*([a-zA-Z]{2,})/gi;
+    let emailsFound = [];
+    let match;
+    
+    while ((match = emailRegex.exec(descriptionText)) !== null) {
+      const cleanEmail = `${match[1]}@${match[2]}.${match[3]}`.toLowerCase();
+      emailsFound.push(cleanEmail);
+    }
+
+    // Also look for standard mailto links
+    $('a[href^="mailto:"]').each((i, el) => {
+      const href = $(el).attr('href').replace('mailto:', '').split('?')[0].trim().toLowerCase();
+      if (href) emailsFound.push(href);
+    });
+
     const contactEmail = [...new Set(emailsFound)].filter(e => 
       !e.includes('sentry.io') && 
       !e.endsWith('.png') && 

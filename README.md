@@ -1,10 +1,23 @@
 # 🚀 Autonomous Job Discovery Engine v1.1
 
 
-> **Autonomous Intelligence for the Modern Developer.** 
-> This engine doesn't just scrape; it analyzes, scores, and delivers high-fidelity job opportunities for **Mobile & Flutter** roles directly to your Command Center and Discord.
+> **Autonomous Intelligence for the Modern Developer. 100% Free, Local-First, and Zero-Dependency.** 
+> This engine is architected to run entirely on your own hardware without requiring any third-party paid services or cloud subscriptions.
+
+## 🔒 100% Local-First Architecture
+To ensure maximum reliability and zero operational costs in production, this platform eliminates forced third-party dependencies:
+- **Storage**: Defaults to **SQLite** (Local Database). No cloud storage required.
+- **Intelligence**: Resume parsing happens **100% locally** via `pdf-parse`.
+- **AI Tailoring**: Strictly optional (via Gemini Free Tier). Platform remains fully functional without it.
+- **Notifications**: Primary delivery is via **Local Console/Logs**. (Optional Discord webhooks).
+- **Security**: No external database connections mean your data stays on your machine.
 
 ## 🌟 Key Updates in v1.1
+- **Local Stability**: Removed Supabase dependency to prevent "Inactivity Pausing" or billing surprises.
+- **Zero-Config Matching**: Engine now initializes with a robust default profile if no CV is provided.
+- **Unified CORS**: Simplified local access for extensions and multi-device local network viewing.
+- **Kanban Tracker**: Fully offline application status management.
+
 - **Deep Discovery Depth**: Increased LinkedIn search depth to 4 pages per role (100+ jobs) to ensure 24/7 volume.
 - **Flutter & Mobile Intelligence**: Enhanced matching engine with specialized scoring boosts for Dart, Flutter, and Mobile platforms.
 - **Smart Notification Tiering**: Discord alerts are now strictly scoped to high-matching roles (70%+) or relevant Mobile/Flutter positions (50%+).

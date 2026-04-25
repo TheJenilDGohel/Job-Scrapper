@@ -1,33 +1,62 @@
 const cron = require('node-cron');
 const { exec } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 const chalk = require('chalk');
 
-console.log(chalk.blue('=== Starting Background Job Scraper ==='));
-console.log('Scheduled to run every 1 hour.');
+const LOG_FILE = path.join(process.cwd(), 'logs', 'cron-status.log');
 
-// Run every hour: '0 * * * *'
-const runJob = () => {
-  console.log(chalk.yellow(`\n[${new Date().toISOString()}] Running job scrape...`));
-  
+// Ensure logs directory exists
+if (!fs.existsSync(path.dirname(LOG_FILE))) {
+  fs.mkdirSync(path.dirname(LOG_FILE), { recursive: true });
+}
+
+function logToDashboard(message, level = 'INFO') {
+  const timestamp = new Date().toISOString();
+  const entry = `[${timestamp}] [${level}] ${message}\n`;
+  fs.appendFileSync(LOG_FILE, entry);
+  console.log(message);
+}
+
+console.log(chalk.blue('=== Starting Background Job Scraper & Recovery Service ==='));
+console.log('Main Scrape: Every 1 hour');
+console.log('Recovery/Enrichment: Every 2 hours');
+
+const runScrape = () => {
+  logToDashboard('🚀 Triggering scheduled scrape cycle (All Profiles)...', 'SCRAPE');
   const cliPath = path.join(__dirname, '../cli/index.js');
   
   exec(`node "${cliPath}" run`, (error, stdout, stderr) => {
     if (error) {
-      console.error(chalk.red(`Error executing job: ${error.message}`));
+      logToDashboard(`❌ Scrape Error: ${error.message}`, 'ERROR');
       return;
     }
-    if (stderr) {
-      console.error(chalk.yellow(`Stderr: ${stderr}`));
-    }
-    console.log(stdout);
-    console.log(chalk.green(`[${new Date().toISOString()}] Job completed.`));
+    logToDashboard('✅ Multi-profile scrape cycle completed.');
   });
 };
 
-// Schedule for every hour
-cron.schedule('0 * * * *', runJob);
+const runMaintenance = () => {
+  logToDashboard('🧹 Starting maintenance cycle (Sanitize & Enrich)...', 'MAINT');
+  const cliPath = path.join(__dirname, '../cli/index.js');
+  
+  // Sanitize first, then enrich
+  exec(`node "${cliPath}" sanitize`, (err) => {
+    if (err) logToDashboard(`❌ Sanitization failed: ${err.message}`, 'ERROR');
+    
+    exec(`node "${cliPath}" enrich --limit 20`, (error) => {
+      if (error) logToDashboard(`❌ Enrichment failed: ${error.message}`, 'ERROR');
+      logToDashboard('✅ Maintenance cycle completed.');
+    });
+  });
+};
 
-// Run once immediately on startup
-console.log(chalk.cyan('Triggering initial startup scrape...'));
-runJob();
+// Main Scrape - Hourly
+cron.schedule('0 * * * *', runScrape);
+
+// Maintenance - Every 4 Hours
+cron.schedule('0 */4 * * *', runMaintenance);
+
+// Startup execution
+logToDashboard('⚡ Initializing production services...');
+runScrape();
+setTimeout(runMaintenance, 1000 * 60 * 10); // 10 mins after startup

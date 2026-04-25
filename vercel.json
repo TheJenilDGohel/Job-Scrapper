@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/server/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(css|js|img)/(.*)",
+      "dest": "/src/server/public/$1/$2"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/src/server/index.js"
+    },
+    {
+      "src": "/ping",
+      "dest": "/src/server/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/src/server/public/index.html"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}

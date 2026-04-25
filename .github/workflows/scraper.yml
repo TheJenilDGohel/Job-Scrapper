@@ -39,7 +39,9 @@ jobs:
           MAX_RETRIES: "3"
           INTERNAL_SESSION_TOKEN: ${{ secrets.INTERNAL_SESSION_TOKEN }}
 
-      - name: Keep-Alive Logs
+      - name: Keep-Alive & Warmup
         run: |
           echo "Scrape completed at $(date)"
+          echo "Pinging production dashboard to prevent Vercel sleep..."
+          curl -s "${{ secrets.PRODUCTION_URL }}/ping" || echo "Warmup ping failed (check PRODUCTION_URL secret)"
           echo "Supabase activity pinged to prevent auto-pause."

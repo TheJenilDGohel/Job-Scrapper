@@ -2,7 +2,9 @@ const fs = require('fs');
 const pdfParse = require('pdf-parse');
 
 class CvParser {
-  constructor() {
+  constructor(filepath) {
+    this.filepath = filepath;
+    this.rawText = '';
     this.knownSkills = [
       'flutter', 'react native', 'kotlin', 'swift', 'javascript', 'typescript',
       'node.js', 'react', 'python', 'java', 'c++', 'sql', 'firebase', 'mongodb'
@@ -16,15 +18,23 @@ class CvParser {
     ];
   }
 
-  async parsePdf(filepath) {
+  async parse() {
     try {
-      const dataBuffer = fs.readFileSync(filepath);
+      if (!this.filepath || !fs.existsSync(this.filepath)) {
+        throw new Error(`CV file not found at ${this.filepath}`);
+      }
+      const dataBuffer = fs.readFileSync(this.filepath);
       const data = await pdfParse(dataBuffer);
-      return this.extractInformation(data.text);
+      this.rawText = data.text;
+      return this.extractInformation(this.rawText);
     } catch (error) {
       console.error('Error parsing PDF:', error);
       throw error;
     }
+  }
+
+  getRawText() {
+    return this.rawText;
   }
 
   extractInformation(text) {

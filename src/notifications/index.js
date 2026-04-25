@@ -1,32 +1,38 @@
-const axios = require('axios');
-
 class NotificationService {
   constructor() {
-    this.webhookUrl = process.env.DISCORD_WEBHOOK_URL; // Using discord as preferred by user
+    this.webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   }
 
   async notify(jobs) {
     if (!jobs || jobs.length === 0) return;
-    if (!this.webhookUrl) {
-      console.log('No webhook URL configured. Skipping notifications.');
-      return;
-    }
 
-    try {
-      const embeds = jobs.slice(0, 5).map(job => ({
-        title: job.jobTitle,
-        url: job.jobUrl,
-        description: `**Company:** ${job.company}\n**Score:** ${job.score}\n**Location:** ${job.location}`,
-        color: 3447003
-      }));
+    // Log to console - Always free and reliable
+    console.log(`\n🔔 [Notification] Found ${jobs.length} relevant opportunities:`);
+    jobs.slice(0, 10).forEach(j => {
+      console.log(`   - ${j.jobTitle} @ ${j.company} [Match: ${j.score}%]`);
+    });
 
-      await axios.post(this.webhookUrl, {
-        content: `Found ${jobs.length} new high-matching jobs!`,
-        embeds
-      });
-      console.log('Notifications sent successfully.');
-    } catch (err) {
-      console.error('Failed to send notifications:', err.message);
+    // Optional third-party webhook (Discord)
+    if (this.webhookUrl) {
+      const axios = require('axios');
+      try {
+        const embeds = jobs.slice(0, 5).map(job => ({
+          title: job.jobTitle,
+          url: job.url,
+          description: `**Company:** ${job.company}\n**Score:** ${job.score}%\n**Location:** ${job.location || 'Remote'}`,
+          color: 3447003
+        }));
+
+        await axios.post(this.webhookUrl, {
+          content: `🚀 **Job Discovery Update**: Found ${jobs.length} new matches!`,
+          embeds
+        });
+        console.log('✅ Webhook notification dispatched.');
+      } catch (err) {
+        console.error('⚠️ Webhook failed:', err.message);
+      }
+    } else {
+      console.log('💡 Tip: Set DISCORD_WEBHOOK_URL in .env to receive these alerts on Discord.');
     }
   }
 }
